@@ -101,6 +101,7 @@ function parseCsv(text) {
 // Main application logic
 async function init() {
   const totalSalesElement = document.getElementById('total-sales');
+  const productSalesTable = document.getElementById('product-sales').querySelector('tbody');
   
   try {
     // Get the CSV attachment URL
@@ -145,19 +146,33 @@ async function init() {
     
     // Find sales column (assume it's named 'Sales' or second column)
     let salesColumnIndex = 1; // Default to second column
+    let productColumnIndex = 0; // Default to first column
     if (headers) {
       const salesHeaderIndex = headers.findIndex(h => h.toLowerCase() === 'sales');
       if (salesHeaderIndex !== -1) {
         salesColumnIndex = salesHeaderIndex;
       }
+      const productHeaderIndex = headers.findIndex(h => h.toLowerCase() === 'products');
+      if (productHeaderIndex !== -1) {
+        productColumnIndex = productHeaderIndex;
+      }
     }
     
-    // Calculate total sales
+    // Calculate total sales and populate product sales table
     let totalSales = 0;
+    productSalesTable.innerHTML = '';
+    
     for (const row of rows) {
       const salesValue = parseFloat(row[salesColumnIndex]);
+      const productName = row[productColumnIndex];
+      
       if (!isNaN(salesValue)) {
         totalSales += salesValue;
+        
+        // Add row to product sales table
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${productName}</td><td>${salesValue.toFixed(2)}</td>`;
+        productSalesTable.appendChild(tr);
       }
     }
     
